@@ -260,10 +260,24 @@
             }
         }
 
-        function drawCircularScore(doc, x, y, score, label, color) {
+        function drawCircularScore(doc, x, y, score, label, usePerformanceColors = false) {
             const radius = 25;
             const centerX = x + radius;
             const centerY = y + radius;
+            
+            // Determine color based on performance thresholds if specified
+            let color;
+            if (usePerformanceColors) {
+                if (score > 85) {
+                    color = [76, 175, 80]; // Green
+                } else if (score >= 75) {
+                    color = [255, 193, 7]; // Yellow
+                } else {
+                    color = [244, 67, 54]; // Red
+                }
+            } else {
+                color = usePerformanceColors; // Use provided color array
+            }
             
             // Background circle (gray)
             doc.setFillColor(200, 200, 200);
@@ -420,11 +434,11 @@
             const stressScore = scores.stress || 0;
             const calmScore = scores.calm || 0;
             
-            // Draw 4 circular charts in 2x2 grid
-            drawCircularScore(doc, 35, 60, focusScore, 'FOCUS SCORE', [255, 193, 7]); // Yellow
-            drawCircularScore(doc, 125, 60, fatigueScore, 'LIMIT FATIGUE SCORE', [76, 175, 80]); // Green
-            drawCircularScore(doc, 35, 150, stressScore, 'LIMIT STRESS SCORE', [76, 175, 80]); // Green
-            drawCircularScore(doc, 125, 150, calmScore, 'CALM SCORE', [255, 193, 7]); // Yellow
+            // Draw 4 circular charts in 2x2 grid with performance-based colors
+            drawCircularScore(doc, 35, 60, focusScore, 'FOCUS SCORE', true);
+            drawCircularScore(doc, 125, 60, fatigueScore, 'LIMIT FATIGUE SCORE', true);
+            drawCircularScore(doc, 35, 150, stressScore, 'LIMIT STRESS SCORE', true);
+            drawCircularScore(doc, 125, 150, calmScore, 'CALM SCORE', true);
             
             // PAGE 4 - MIND TRAINING RESULTS
             doc.addPage();
