@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thrive Performance Report Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #2a5298;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a5298;
+        }
+        .section-title {
+            color: #1e3c72;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+        .score-display {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 60, 114, 0.4);
+        }
+        .clear-btn {
+            background: linear-gradient(135deg, #c62828 0%, #e53935 100%);
+        }
+        .info-box {
+            background-color: #e8f0fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2a5298;
+            font-size: 14px;
+        }
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+        .row .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thrive Performance Mind Training</h1>
+        <div class="subtitle">Monthly Performance Report Generator</div>
+        
+        <div class="info-box">
+            <strong>Instructions:</strong> Fill in all fields below. Scores will calculate automatically. The PDF will match your Canva template design with circular score charts.
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">Client Information</div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Player Name</label>
+                    <input type="text" id="player_name" placeholder="Enter player name">
+                </div>
+                <div class="form-group">
+                    <label>Report Date</label>
+                    <input type="date" id="report_date">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">Performance Metrics (Goal = 60%)</div>
+            
+            <div class="metrics-grid">
+                <div class="form-group">
+                    <label>Focus Reward Rate (%)</label>
+                    <input type="number" step="1" id="focus_rate" placeholder="e.g., 52" oninput="calculateScore('focus')">
+                    <div class="score-display" id="focus_score_display">Score: --/100</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Calm Reward Rate (%)</label>
+                    <input type="number" step="1" id="calm_rate" placeholder="e.g., 45" oninput="calculateScore('calm')">
+                    <div class="score-display" id="calm_score_display">Score: --/100</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Limit Fatigue Reward Rate (%)</label>
+                    <input type="number" step="1" id="fatigue_rate" placeholder="e.g., 56" oninput="calculateScore('fatigue')">
+                    <div class="score-display" id="fatigue_score_display">Score: --/100</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Limit Stress Reward Rate (%)</label>
+                    <input type="number" step="1" id="stress_rate" placeholder="e.g., 52" oninput="calculateScore('stress')">
+                    <div class="score-display" id="stress_score_display">Score: --/100</div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label>Average Reward Duration (seconds)</label>
+                    <input type="number" step="0.01" id="avg_duration" placeholder="e.g., 0.68">
+                </div>
+                
+                <div class="form-group">
+                    <label>Average Breath Rate (breaths/minute)</label>
+                    <input type="number" step="0.1" id="breaths_value" placeholder="e.g., 4.85" oninput="calculateBreathScore()">
+                    <div class="score-display" id="breaths_score_display">Score: --/100</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">Future Adjustments</div>
+            
+            <div class="form-group">
+                <label>Mind Training Recommendations</label>
+                <textarea id="mind_training" placeholder="Enter recommendations for mind training adjustments..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Performance Training Recommendations</label>
+                <textarea id="performance_training" placeholder="Enter recommendations for performance training adjustments..."></textarea>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="generatePDF()">📄 Generate PDF Report</button>
+            <button class="clear-btn" onclick="clearForm()">Clear All</button>
+        </div>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+        
+        let scores = {
+            focus: null,
+            calm: null,
+            fatigue: null,
+            stress: null,
+            breaths: null
+        };
+
+        function calculateScore(type) {
+            const rateInput = document.getElementById(`${type}_rate`);
+            const scoreDisplay = document.getElementById(`${type}_score_display`);
+            
+            const rate = parseFloat(rateInput.value);
+            
+            if (!isNaN(rate)) {
+                const score = (rate * 100 / 60).toFixed(0);
+                scores[type] = score;
+                scoreDisplay.textContent = `Score: ${score}/100`;
+            } else {
+                scores[type] = null;
+                scoreDisplay.textContent = 'Score: --/100';
+            }
+        }
+
+        function calculateBreathScore() {
+            const breathInput = document.getElementById('breaths_value');
+            const scoreDisplay = document.getElementById('breaths_score_display');
+            
+            const breaths = parseFloat(breathInput.value);
+            
+            if (!isNaN(breaths)) {
+                const deviation = Math.abs(breaths - 6);
+                const score = Math.max(0, 100 - (deviation * 16.67)).toFixed(0);
+                scores.breaths = score;
+                scoreDisplay.textContent = `Score: ${score}/100`;
+            } else {
+                scores.breaths = null;
+                scoreDisplay.textContent = 'Score: --/100';
+            }
+        }
+
+        function drawCircularScore(doc, x, y, score, label, color) {
+            const radius = 25;
+            const centerX = x + radius;
+            const centerY = y + radius;
+            
+            // Background circle (gray)
+            doc.setFillColor(200, 200, 200);
+            doc.circle(centerX, centerY, radius, 'F');
+            
+            // Progress arc
+            if (score > 0) {
+                const endAngle = (score / 100) * 360;
+                doc.setFillColor(color[0], color[1], color[2]);
+                
+                // Draw arc as filled wedge
+                const segments = 60;
+                for (let i = 0; i <= segments; i++) {
+                    const angle1 = ((i / segments) * endAngle - 90) * Math.PI / 180;
+                    const angle2 = (((i + 1) / segments) * endAngle - 90) * Math.PI / 180;
+                    
+                    if (i < segments * (endAngle / 360)) {
+                        doc.setFillColor(color[0], color[1], color[2]);
+                        doc.triangle(
+                            centerX, centerY,
+                            centerX + radius * Math.cos(angle1), centerY + radius * Math.sin(angle1),
+                            centerX + radius * Math.cos(angle2), centerY + radius * Math.sin(angle2),
+                            'F'
+                        );
+                    }
+                }
+                
+                // Inner circle (navy blue)
+                doc.setFillColor(30, 60, 114);
+                doc.circle(centerX, centerY, radius * 0.75, 'F');
+            }
+            
+            // Score text
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont(undefined, 'bold');
+            doc.text(`${score}%`, centerX, centerY + 2, { align: 'center' });
+            
+            // Label
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text(label, centerX, y - 8, { align: 'center' });
+        }
+
+        function generatePDF() {
+            try {
+                console.log('Starting PDF generation...');
+                
+                const playerName = document.getElementById('player_name').value || 'Player Name';
+                const reportDate = document.getElementById('report_date').value;
+                
+                if (!reportDate) {
+                    alert('Please select a report date');
+                    return;
+                }
+                
+                console.log('Player:', playerName, 'Date:', reportDate);
+            
+            const formattedDate = new Date(reportDate).toLocaleDateString('en-US', { 
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            const doc = new jsPDF();
+            
+            // PAGE 1 - COVER PAGE
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            // Logo box (light blue)
+            doc.setFillColor(135, 206, 235);
+            doc.rect(15, 20, 65, 22, 'F');
+            doc.setTextColor(30, 60, 114);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('THRIVE', 47.5, 28, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text('PERFORMANCE MIND TRAINING', 47.5, 37, { align: 'center' });
+            
+            // Date in top right
+            doc.setTextColor(135, 206, 235);
+            doc.setFontSize(12);
+            doc.text(formattedDate, 195, 30, { align: 'right' });
+            
+            // Main title
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(48);
+            doc.setFont(undefined, 'bold');
+            doc.text('MONTLHY', 105, 110, { align: 'center' });
+            doc.text('PERFORMANCE', 105, 135, { align: 'center' });
+            doc.text('REPORT', 105, 160, { align: 'center' });
+            
+            // Presented to
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(135, 206, 235);
+            doc.text('PRESENTED TO', 195, 250, { align: 'right' });
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.text(playerName, 195, 258, { align: 'right' });
+            
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(135, 206, 235);
+            doc.text('PRESENTED BY', 195, 270, { align: 'right' });
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(255, 255, 255);
+            doc.text('Thrive Golf', 195, 278, { align: 'right' });
+            
+            // PAGE 2 - TABLE OF CONTENTS
+            doc.addPage();
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(42);
+            doc.setFont(undefined, 'bold');
+            doc.text('TABLE OF', 30, 80);
+            doc.text('CONTENTS', 30, 110);
+            
+            // Table
+            const tableY = 140;
+            doc.setDrawColor(135, 206, 235);
+            doc.setLineWidth(0.5);
+            
+            const items = [
+                ['At a Glance', '3'],
+                ['Mind Training Results', '4'],
+                ['Future Adjustments', '5'],
+                ['Contact Information', '6']
+            ];
+            
+            items.forEach((item, index) => {
+                const y = tableY + (index * 15);
+                doc.rect(30, y, 150, 12);
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'normal');
+                doc.text(item[0], 35, y + 8);
+                doc.text(item[1], 175, y + 8, { align: 'right' });
+            });
+            
+            // PAGE 3 - AT A GLANCE (Circular Charts)
+            doc.addPage();
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            const focusScore = scores.focus || 0;
+            const fatigueScore = scores.fatigue || 0;
+            const stressScore = scores.stress || 0;
+            const calmScore = scores.calm || 0;
+            
+            // Draw 4 circular charts in 2x2 grid
+            drawCircularScore(doc, 35, 60, focusScore, 'FOCUS SCORE', [255, 193, 7]); // Yellow
+            drawCircularScore(doc, 125, 60, fatigueScore, 'LIMIT FATIGUE SCORE', [76, 175, 80]); // Green
+            drawCircularScore(doc, 35, 150, stressScore, 'LIMIT STRESS SCORE', [76, 175, 80]); // Green
+            drawCircularScore(doc, 125, 150, calmScore, 'CALM SCORE', [255, 193, 7]); // Yellow
+            
+            // PAGE 4 - MIND TRAINING RESULTS
+            doc.addPage();
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            // Header
+            doc.setDrawColor(135, 206, 235);
+            doc.setLineWidth(0.5);
+            doc.line(20, 20, 120, 20);
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.text('MONTHY PERFORMANCE REPORT', 190, 20, { align: 'right' });
+            
+            // Title
+            doc.setFontSize(38);
+            doc.setFont(undefined, 'bold');
+            doc.text('MIND TRAINING', 20, 55);
+            doc.text('RESULTS', 20, 75);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'normal');
+            doc.text('GOAL = 60%', 100, 75);
+            
+            // Metrics
+            let yPos = 100;
+            const metrics = [
+                { label: 'FOCUS', sublabel: 'REWARD RATE:', value: document.getElementById('focus_rate').value + '%' },
+                { label: 'LIMIT FATIGUE', sublabel: 'REWARD RATE:', value: document.getElementById('fatigue_rate').value + '%' },
+                { label: 'LIMIT STRESS', sublabel: 'REWARD RATE:', value: document.getElementById('stress_rate').value + '%' },
+                { label: 'CALM', sublabel: 'REWARD RATE:', value: document.getElementById('calm_rate').value + '%' }
+            ];
+            
+            metrics.forEach(metric => {
+                doc.setFontSize(16);
+                doc.setFont(undefined, 'bold');
+                doc.text(metric.label, 20, yPos);
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'normal');
+                doc.text(metric.sublabel + ' ' + metric.value, 20, yPos + 7);
+                yPos += 25;
+            });
+            
+            // Right side metrics
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('AVERAGE', 120, 115);
+            doc.text('REWARD', 120, 125);
+            doc.text('DURATION', 120, 135);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            doc.text(document.getElementById('avg_duration').value + ' SECONDS', 120, 145);
+            
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('AVERAGE', 120, 175);
+            doc.text('BREATH', 120, 185);
+            doc.text('RATE', 120, 195);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            doc.text(document.getElementById('breaths_value').value + ' BREATHS/MINUTE', 120, 205);
+            
+            doc.setFontSize(8);
+            doc.text('PAGE 4', 190, 285, { align: 'right' });
+            
+            // PAGE 5 - FUTURE ADJUSTMENTS
+            doc.addPage();
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            doc.setDrawColor(135, 206, 235);
+            doc.line(20, 20, 120, 20);
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.text('MONTHLY PERFORMANCE REPORT', 190, 20, { align: 'right' });
+            
+            doc.setFontSize(36);
+            doc.setFont(undefined, 'bold');
+            doc.text('FUTURE ADUSTMENTS', 20, 60);
+            
+            // Mind Training section
+            doc.setFontSize(18);
+            doc.text('MIND TRAINING', 20, 90);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            const mindTraining = document.getElementById('mind_training').value || 'No recommendations provided';
+            const mindLines = doc.splitTextToSize(mindTraining, 170);
+            doc.text(mindLines, 20, 100);
+            
+            // Performance Training section
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('PERFORMANCE TRAINING', 20, 160);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            const perfTraining = document.getElementById('performance_training').value || 'No recommendations provided';
+            const perfLines = doc.splitTextToSize(perfTraining, 170);
+            doc.text(perfLines, 20, 170);
+            
+            doc.setFontSize(8);
+            doc.text('PAGE 5', 190, 285, { align: 'right' });
+            
+            // PAGE 6 - CONTACT
+            doc.addPage();
+            doc.setFillColor(30, 60, 114);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(48);
+            doc.setFont(undefined, 'bold');
+            doc.text('QUESTIONS?', 30, 80);
+            doc.text('CONTACT US.', 30, 110);
+            
+            // Logo at bottom
+            doc.setFillColor(135, 206, 235);
+            doc.rect(20, 240, 65, 22, 'F');
+            doc.setTextColor(30, 60, 114);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('THRIVE', 52.5, 248, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.text('PERFORMANCE MIND TRAINING', 52.5, 257, { align: 'center' });
+            
+            // Contact info
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.text('www.thrive-golf.com', 190, 250, { align: 'right' });
+            doc.text('info@thrive-performance.com', 190, 258, { align: 'right' });
+            
+            // Save
+            const fileName = `Thrive_Monthly_Report_${playerName.replace(/\s+/g, '_')}_${reportDate}.pdf`;
+            console.log('Saving PDF as:', fileName);
+            
+            try {
+                doc.save(fileName);
+                alert('PDF generated successfully! Check your Downloads folder.');
+            } catch (saveError) {
+                console.error('Save error:', saveError);
+                // Fallback: open in new window
+                const pdfBlob = doc.output('blob');
+                const url = URL.createObjectURL(pdfBlob);
+                window.open(url, '_blank');
+                alert('PDF opened in new tab. Right-click and select "Save as..." to download.');
+            }
+            
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+                alert('Error generating PDF: ' + error.message);
+            }
+        }
+
+        function clearForm() {
+            document.querySelectorAll('input, textarea').forEach(input => input.value = '');
+            document.querySelectorAll('.score-display').forEach(display => {
+                display.textContent = 'Score: --/100';
+            });
+            scores = { focus: null, calm: null, fatigue: null, stress: null, breaths: null };
+        }
+        
+        // Set default date to today
+        document.getElementById('report_date').valueAsDate = new Date();
+    </script>
+</body>
+</html>
