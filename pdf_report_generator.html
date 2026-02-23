@@ -240,6 +240,12 @@
     </div>
 
     <script>
+        // Check if jsPDF loaded
+        if (!window.jspdf) {
+            console.error('jsPDF library failed to load!');
+            alert('Error: PDF library failed to load. Please refresh the page.');
+        }
+        
         const { jsPDF } = window.jspdf;
         
         let scores = {
@@ -357,7 +363,15 @@
 
         function generatePDF() {
             try {
-                console.log('Starting PDF generation...');
+                console.log('=== Starting PDF generation ===');
+                
+                // Check jsPDF availability
+                if (typeof jsPDF === 'undefined') {
+                    alert('Error: jsPDF is not loaded. Please refresh the page.');
+                    console.error('jsPDF is undefined');
+                    return;
+                }
+                console.log('jsPDF loaded successfully');
                 
                 const playerName = document.getElementById('player_name').value || 'Player Name';
                 const reportDate = document.getElementById('report_date').value;
@@ -619,14 +633,21 @@
             
             // Save
             const fileName = `Thrive_Monthly_Report_${playerName.replace(/\s+/g, '_')}_${reportDate}.pdf`;
-            console.log('Saving PDF as:', fileName);
+            console.log('About to save PDF as:', fileName);
             
-            doc.save(fileName);
-            alert('PDF generated successfully! Check your Downloads folder.');
+            try {
+                doc.save(fileName);
+                console.log('PDF saved successfully!');
+                alert('PDF generated successfully! Check your Downloads folder.');
+            } catch (saveError) {
+                console.error('Save error:', saveError);
+                alert('Error saving PDF: ' + saveError.message + '\n\nTry using a different browser or check your download settings.');
+            }
             
             } catch (error) {
                 console.error('PDF Generation Error:', error);
-                alert('Error generating PDF: ' + error.message);
+                console.error('Error stack:', error.stack);
+                alert('Error generating PDF: ' + error.message + '\n\nPlease check the browser console for details (F12).');
             }
         }
 
