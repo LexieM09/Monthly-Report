@@ -161,9 +161,16 @@
                 </div>
             </div>
             
-            <div class="form-group">
-                <label>Upload Logo (optional - JPG or PNG)</label>
-                <input type="file" id="logo_upload" accept="image/png,image/jpeg" onchange="handleLogoUpload(event)">
+            <div class="row">
+                <div class="form-group">
+                    <label>Report Type</label>
+                    <input type="text" id="report_type" placeholder="e.g., Monthly, Weekly, Initial" value="Monthly">
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload Logo (optional - JPG or PNG)</label>
+                    <input type="file" id="logo_upload" accept="image/png,image/jpeg" onchange="handleLogoUpload(event)">
+                </div>
             </div>
         </div>
 
@@ -309,6 +316,100 @@
             if (score >= 40) return [255, 152, 0];      // Orange
             return [244, 67, 54];                        // Red
         }
+        
+        function getColorCategory(score) {
+            // Returns 'green' for >85%, 'yellow_red' for <=85%
+            return score > 85 ? 'green' : 'yellow_red';
+        }
+        
+        function getPerformanceNarrative(focusScore, calmScore, stressScore, fatigueScore) {
+            const focus = getColorCategory(focusScore);
+            const calm = getColorCategory(calmScore);
+            const stress = getColorCategory(stressScore);
+            const fatigue = getColorCategory(fatigueScore);
+            
+            // All Green
+            if (focus === 'green' && calm === 'green' && stress === 'green' && fatigue === 'green') {
+                return "Client is in an optimal performance state. Focused, calm, mentally energized, and not stress reactive. They are demonstrating strong self regulation, sustained attention, and efficient recovery under pressure. This is a highly balanced and engaged state.";
+            }
+            
+            // Focus Green, Calm Green, Stress Green, Fatigue Yellow/Red
+            if (focus === 'green' && calm === 'green' && stress === 'green' && fatigue === 'yellow_red') {
+                return "Athlete is focused, composed, and handling pressure well, but is mentally drifting at times. Processing may feel slower, engagement can fluctuate, and sustaining intensity over time may be a challenge.";
+            }
+            
+            // Focus Green, Calm Green, Stress Yellow/Red, Fatigue Green
+            if (focus === 'green' && calm === 'green' && stress === 'yellow_red' && fatigue === 'green') {
+                return "Athlete is focused, energized, and generally composed, but tension is elevated. They may be more reactive, tight, or sensitive to mistakes while still maintaining performance output.";
+            }
+            
+            // Focus Green, Calm Yellow/Red, Stress Green, Fatigue Green
+            if (focus === 'green' && calm === 'yellow_red' && stress === 'green' && fatigue === 'green') {
+                return "Athlete is working hard and achieving, with strong engagement and pressure control, but struggles to fully relax or let go. Effort is high, though ease and fluidity are limited.";
+            }
+            
+            // Focus Yellow/Red, Calm Green, Stress Green, Fatigue Green
+            if (focus === 'yellow_red' && calm === 'green' && stress === 'green' && fatigue === 'green') {
+                return "Athlete is composed, energized, and not overly stress-reactive, but attention control is inconsistent. There may be increased sensitivity to distractions or difficulty locking fully into the task.";
+            }
+            
+            // Focus Green, Calm Green, Stress Yellow/Red, Fatigue Yellow/Red
+            if (focus === 'green' && calm === 'green' && stress === 'yellow_red' && fatigue === 'yellow_red') {
+                return "Athlete is engaged and can stay emotionally steady, but is operating with elevated tension and lower mental endurance. They may start strong but become reactive or mentally drained as pressure builds.";
+            }
+            
+            // Focus Green, Calm Yellow/Red, Stress Green, Fatigue Yellow/Red
+            if (focus === 'green' && calm === 'yellow_red' && stress === 'green' && fatigue === 'yellow_red') {
+                return "Athlete is engaged and not overly reactive to pressure, but struggles to relax and may mentally drift. Effort is present, but composure and sustained clarity fluctuate.";
+            }
+            
+            // Focus Green, Calm Yellow/Red, Stress Yellow/Red, Fatigue Green
+            if (focus === 'green' && calm === 'yellow_red' && stress === 'yellow_red' && fatigue === 'green') {
+                return "Athlete is engaged and mentally energized, but tension is high and relaxation is limited. They may look intense and driven, but tightness and reactivity could interfere with fluid execution.";
+            }
+            
+            // Focus Yellow/Red, Calm Green, Stress Green, Fatigue Yellow/Red
+            if (focus === 'yellow_red' && calm === 'green' && stress === 'green' && fatigue === 'yellow_red') {
+                return "Athlete is emotionally steady and not highly stress reactive, but engagement and cognitive sharpness are reduced. They may appear relaxed, yet struggle to fully lock in or sustain attention.";
+            }
+            
+            // Focus Yellow/Red, Calm Green, Stress Yellow/Red, Fatigue Green
+            if (focus === 'yellow_red' && calm === 'green' && stress === 'yellow_red' && fatigue === 'green') {
+                return "Athlete has energy and general composure, but focus fluctuates and tension rises under pressure. Distractions and reactivity may interfere despite good baseline regulation.";
+            }
+            
+            // Focus Yellow/Red, Calm Yellow/Red, Stress Green, Fatigue Green
+            if (focus === 'yellow_red' && calm === 'yellow_red' && stress === 'green' && fatigue === 'green') {
+                return "Athlete has energy and lower stress reactivity, but struggles with both engagement and relaxation. They may feel internally unsettled and externally inconsistent, with attention drifting and fluidity reduced.";
+            }
+            
+            // Focus Green, Calm Yellow/Red, Stress Yellow/Red, Fatigue Yellow/Red
+            if (focus === 'green' && calm === 'yellow_red' && stress === 'yellow_red' && fatigue === 'yellow_red') {
+                return "Athlete can engage briefly, but tension is high, relaxation is limited, and mental endurance is reduced. Focus may come in short bursts, but sustaining quality performance under pressure will be difficult.";
+            }
+            
+            // Focus Yellow/Red, Calm Green, Stress Yellow/Red, Fatigue Yellow/Red
+            if (focus === 'yellow_red' && calm === 'green' && stress === 'yellow_red' && fatigue === 'yellow_red') {
+                return "Athlete is generally composed, but struggles with engagement, energy, and pressure reactivity. They may appear relaxed externally, yet lack sharpness and become overwhelmed when intensity rises.";
+            }
+            
+            // Focus Yellow/Red, Calm Yellow/Red, Stress Green, Fatigue Yellow/Red
+            if (focus === 'yellow_red' && calm === 'yellow_red' && stress === 'green' && fatigue === 'yellow_red') {
+                return "Athlete is not overly reactive to pressure, but attention control, relaxation, and mental endurance are limited. Performance may feel flat, inconsistent, or disengaged rather than tense.";
+            }
+            
+            // Focus Yellow/Red, Calm Yellow/Red, Stress Yellow/Red, Fatigue Green
+            if (focus === 'yellow_red' && calm === 'yellow_red' && stress === 'yellow_red' && fatigue === 'green') {
+                return "Athlete has mental energy available, but struggles with attention control, relaxation, and tension. They may feel wired but unfocused - high effort with low efficiency.";
+            }
+            
+            // All Yellow/Red
+            if (focus === 'yellow_red' && calm === 'yellow_red' && stress === 'yellow_red' && fatigue === 'yellow_red') {
+                return "Athlete is in a neutral to underperforming state across the board. Engagement is inconsistent, relaxation is limited, tension is present, and mental endurance is reduced. Performance may feel effortful, reactive, and difficult to sustain, with no single strength currently compensating for weaknesses.";
+            }
+            
+            return ""; // Fallback
+        }
 
         function drawCircularScore(doc, x, y, score, label, usePerformanceColors = false) {
             const centerX = x + 40;
@@ -375,13 +476,14 @@
                 
                 const playerName = document.getElementById('player_name').value || 'Player Name';
                 const reportDate = document.getElementById('report_date').value;
+                const reportType = document.getElementById('report_type').value || 'Monthly';
                 
                 if (!reportDate) {
                     alert('Please select a report date');
                     return;
                 }
                 
-                console.log('Player:', playerName, 'Date:', reportDate);
+                console.log('Player:', playerName, 'Date:', reportDate, 'Type:', reportType);
             
             const formattedDate = new Date(reportDate).toLocaleDateString('en-US', { 
                 month: 'long',
@@ -420,7 +522,7 @@
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(48);
             doc.setFont(undefined, 'bold');
-            doc.text('MONTHLY', 105, 110, { align: 'center' });
+            doc.text(reportType.toUpperCase(), 105, 110, { align: 'center' });
             doc.text('PERFORMANCE', 105, 135, { align: 'center' });
             doc.text('REPORT', 105, 160, { align: 'center' });
             
@@ -492,6 +594,14 @@
             drawCircularScore(doc, 25, 150, stressScore, 'LIMIT STRESS SCORE', true);
             drawCircularScore(doc, 105, 150, calmScore, 'CALM SCORE', true);
             
+            // Add performance state narrative
+            const narrative = getPerformanceNarrative(focusScore, calmScore, stressScore, fatigueScore);
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'normal');
+            const narrativeLines = doc.splitTextToSize(narrative, 170);
+            doc.text(narrativeLines, 20, 245);
+            
             // PAGE 4 - MIND TRAINING RESULTS
             doc.addPage();
             doc.setFillColor(30, 60, 114);
@@ -503,7 +613,7 @@
             doc.line(20, 20, 120, 20);
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(10);
-            doc.text('MONTHLY PERFORMANCE REPORT', 190, 20, { align: 'right' });
+            doc.text(reportType.toUpperCase() + ' PERFORMANCE REPORT', 190, 20, { align: 'right' });
             
             // Title
             doc.setFontSize(38);
@@ -572,7 +682,7 @@
             doc.line(20, 20, 120, 20);
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(10);
-            doc.text('MONTHLY PERFORMANCE REPORT', 190, 20, { align: 'right' });
+            doc.text(reportType.toUpperCase() + ' PERFORMANCE REPORT', 190, 20, { align: 'right' });
             
             doc.setFontSize(36);
             doc.setFont(undefined, 'bold');
