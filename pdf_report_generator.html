@@ -455,11 +455,11 @@
             doc.setFont(undefined, 'bold');
             doc.text(`${score}%`, centerX, centerY + 2, { align: 'center' });
             
-            // Label
+            // Label - positioned closer to the dial
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(11);
             doc.setFont(undefined, 'bold');
-            doc.text(label, centerX, y - 8, { align: 'center' });
+            doc.text(label, centerX, y - 3, { align: 'center' });
         }
 
         function generatePDF() {
@@ -594,13 +594,19 @@
             drawCircularScore(doc, 25, 150, stressScore, 'LIMIT STRESS SCORE', true);
             drawCircularScore(doc, 105, 150, calmScore, 'CALM SCORE', true);
             
-            // Add performance state narrative
+            // Add performance state narrative with white background box
             const narrative = getPerformanceNarrative(focusScore, calmScore, stressScore, fatigueScore);
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(11);
+            
+            // Draw white rounded rectangle background
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(15, 235, 180, 50, 3, 3, 'F');
+            
+            // Add narrative text in black
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
             doc.setFont(undefined, 'normal');
             const narrativeLines = doc.splitTextToSize(narrative, 170);
-            doc.text(narrativeLines, 20, 245);
+            doc.text(narrativeLines, 20, 243);
             
             // PAGE 4 - MIND TRAINING RESULTS
             doc.addPage();
