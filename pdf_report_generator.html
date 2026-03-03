@@ -304,7 +304,7 @@
         }
 
         function getScoreColor(score) {
-            if (score >= 80) return [76, 175, 80];      // Green
+            if (score > 85) return [76, 175, 80];       // Green - only >85%
             if (score >= 60) return [255, 193, 7];      // Yellow
             if (score >= 40) return [255, 152, 0];      // Orange
             return [244, 67, 54];                        // Red
@@ -486,10 +486,11 @@
             const calmScore = scores.calm || 0;
             
             // Draw 4 circular charts in 2x2 grid with performance-based colors
-            drawCircularScore(doc, 35, 60, focusScore, 'FOCUS SCORE', true);
-            drawCircularScore(doc, 125, 60, fatigueScore, 'LIMIT FATIGUE SCORE', true);
-            drawCircularScore(doc, 35, 150, stressScore, 'LIMIT STRESS SCORE', true);
-            drawCircularScore(doc, 125, 150, calmScore, 'CALM SCORE', true);
+            // Centered positioning: page width is 210mm, chart width is 80mm each
+            drawCircularScore(doc, 25, 60, focusScore, 'FOCUS SCORE', true);
+            drawCircularScore(doc, 105, 60, fatigueScore, 'LIMIT FATIGUE SCORE', true);
+            drawCircularScore(doc, 25, 150, stressScore, 'LIMIT STRESS SCORE', true);
+            drawCircularScore(doc, 105, 150, calmScore, 'CALM SCORE', true);
             
             // PAGE 4 - MIND TRAINING RESULTS
             doc.addPage();
